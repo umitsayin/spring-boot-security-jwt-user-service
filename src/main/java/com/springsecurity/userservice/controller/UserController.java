@@ -30,7 +30,7 @@ public class UserController {
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = verifier.verify(token);
         String username = decodedJWT.getSubject();
-
+        System.out.println(username);
         return ResponseEntity.ok().body(this.userService.updateUser(user,username));
     }
 

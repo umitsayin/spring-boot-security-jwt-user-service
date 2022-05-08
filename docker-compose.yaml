@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    environment:
+      - MYSQL_USER=dummy
+      - MYSQL_PASSWORD=dummy
+      - MYSQL_DATABASE=userservice
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - 3306:3306

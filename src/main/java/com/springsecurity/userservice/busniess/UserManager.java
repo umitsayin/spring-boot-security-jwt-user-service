@@ -48,13 +48,14 @@ public class UserManager implements UserService, UserDetailsService {
     }
 
     @Override
-    public Result saveUser(User user) {
+    public DataResult<User> saveUser(User user) {
         log.info("User:{} saved",user.getUsername());
         Role role = this.roleRepository.findByName("ROLE_USER");
+        System.out.println(role.getName());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.getRoles().add(role);
         this.userRepository.save(user);
-        return new SuccessResult("User:{} saved");
+        return new SuccessDataResult<User>("eklendi",user);
     }
 
     @Override
@@ -67,8 +68,8 @@ public class UserManager implements UserService, UserDetailsService {
     @Override
     public DataResult<User> updateUser(User user,String username) {
         User updateUser = this.userRepository.findByUsername(username);
-        updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
         updateUser.setName(user.getName());
+        updateUser.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return new SuccessDataResult<User>("User updated",updateUser);
     }
 
