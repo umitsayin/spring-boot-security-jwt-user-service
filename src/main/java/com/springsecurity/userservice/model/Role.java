@@ -1,4 +1,4 @@
-package com.springsecurity.userservice.entities;
+package com.springsecurity.userservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.springsecurity.userservice.results;
+package com.springsecurity.userservice.result;
 
 public class ErrorDataResult<T> extends DataResult{
     public ErrorDataResult(T data){

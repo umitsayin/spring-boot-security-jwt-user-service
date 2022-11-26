@@ -1,10 +1,9 @@
-package com.springsecurity.userservice.busniess;
+package com.springsecurity.userservice.service;
 
-import com.springsecurity.userservice.entities.User;
-import com.springsecurity.userservice.results.DataResult;
-import com.springsecurity.userservice.results.Result;
+import com.springsecurity.userservice.model.User;
+import com.springsecurity.userservice.result.DataResult;
+import com.springsecurity.userservice.result.Result;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
 public interface UserService {

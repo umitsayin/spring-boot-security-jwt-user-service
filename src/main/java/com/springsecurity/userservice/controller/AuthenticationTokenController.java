@@ -5,9 +5,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springsecurity.userservice.busniess.UserService;
-import com.springsecurity.userservice.entities.Role;
-import com.springsecurity.userservice.entities.User;
+import com.springsecurity.userservice.service.UserService;
+import com.springsecurity.userservice.model.Role;
+import com.springsecurity.userservice.model.User;
+import com.springsecurity.userservice.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,38 +36,30 @@ public class AuthenticationTokenController {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if(request.getHeader(AUTHORIZATION) != null && request.getHeader(AUTHORIZATION).contains("Bearer ")){
             try{
-                String token = request.getHeader(AUTHORIZATION).substring("Bearer ".length());
-                Algorithm algorithm = Algorithm.HMAC256("UMIT_SAYIN".getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(token);
-                String username = decodedJWT.getSubject();
-                User user = this.userService.getUser(username);
+                final String token = request.getHeader(AUTHORIZATION).substring("Bearer ".length());
+                final Algorithm algorithm = Algorithm.HMAC256("UMIT_SAYIN".getBytes());
+                final JWTVerifier verifier = JWT.require(algorithm).build();
+                final DecodedJWT decodedJWT = verifier.verify(token);
+                final String username = decodedJWT.getSubject();
+                final User user = this.userService.getUser(username);
+                final String access_token = JwtTokenUtil.generateAccessToken(user.getUsername(), user.getRoles());
+                final String refresh_token = JwtTokenUtil.generateRefreshToken(username);
+                final Map<String,String> tokens = new HashMap<>();
 
-                String access_token = JWT.create()
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                        .withIssuer(request.getRequestURI())
-                        .withClaim("roles",user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
-                        .sign(algorithm);
-
-                String refresh_token = JWT.create()
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                        .withIssuer(request.getRequestURI())
-                        .withClaim("roles",user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
-                        .sign(algorithm);
-
-                Map<String,String> tokens = new HashMap<>();
                 tokens.put("access_token",access_token);
                 tokens.put("refresh_token",refresh_token);
                 response.setContentType(APPLICATION_JSON_VALUE);
+
                 new ObjectMapper().writeValue(response.getOutputStream(),tokens);
             }catch (Exception e){
                 response.setHeader("error",e.getMessage());
                 response.setStatus(FORBIDDEN.value());
                 response.setContentType(APPLICATION_JSON_VALUE);
-                Map<String,String> error = new HashMap<>();
+
+                final Map<String,String> error = new HashMap<>();
+
                 error.put("error",e.getMessage());
+
                 new ObjectMapper().writeValue(response.getOutputStream(),error);
             }
         }

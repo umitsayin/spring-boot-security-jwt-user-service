@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,27 +33,30 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         }else{
             if(request.getHeader(AUTHORIZATION) != null && request.getHeader(AUTHORIZATION).contains("Bearer ")){
                 try {
-                    String token = request.getHeader("AUTHORIZATION").substring("Bearer ".length());
-                    Algorithm algorithm = Algorithm.HMAC256("UMIT_SAYIN".getBytes());
-                    JWTVerifier verifier = JWT.require(algorithm).build();
-                    DecodedJWT decodedJWT = verifier.verify(token);
-                    String username = decodedJWT.getSubject();
-                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    final String token = request.getHeader("AUTHORIZATION").substring("Bearer ".length());
+                    final Algorithm algorithm = Algorithm.HMAC256("UMIT_SAYIN".getBytes());
+                    final JWTVerifier verifier = JWT.require(algorithm).build();
+                    final DecodedJWT decodedJWT = verifier.verify(token);
+                    final String username = decodedJWT.getSubject();
+                    final String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
 
-                    stream(roles).forEach(role->
-                        authorities.add(new SimpleGrantedAuthority(role))
-                    );
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,null,authorities);
+                    final Collection<SimpleGrantedAuthority> authorities = stream(roles)
+                            .map(role->new SimpleGrantedAuthority(role))
+                            .collect(Collectors.toList());
+
+
+                    final UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,null,authorities);
+
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
                     filterChain.doFilter(request,response);
                 }catch (Exception e){
                     response.setContentType(APPLICATION_JSON_VALUE);
                     response.setStatus(FORBIDDEN.value());
                     response.setHeader("error",e.getMessage());
-                    Map<String,String> error = new HashMap<>();
+
+                    final Map<String,String> error = new HashMap<>();
                     error.put("error",e.getMessage());
+
                     new ObjectMapper().writeValue(response.getOutputStream(),error);
                 }
             }else{

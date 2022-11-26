@@ -1,4 +1,4 @@
-package com.springsecurity.userservice.results;
+package com.springsecurity.userservice.result;
 
 public class SuccessDataResult<T> extends DataResult{
     public SuccessDataResult(T data){

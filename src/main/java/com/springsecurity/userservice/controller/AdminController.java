@@ -1,9 +1,9 @@
 package com.springsecurity.userservice.controller;
 
-import com.springsecurity.userservice.busniess.UserService;
-import com.springsecurity.userservice.entities.User;
-import com.springsecurity.userservice.results.DataResult;
-import com.springsecurity.userservice.results.Result;
+import com.springsecurity.userservice.service.UserService;
+import com.springsecurity.userservice.model.User;
+import com.springsecurity.userservice.result.DataResult;
+import com.springsecurity.userservice.result.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

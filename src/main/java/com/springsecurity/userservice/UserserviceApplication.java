@@ -1,10 +1,7 @@
 package com.springsecurity.userservice;
 
-import com.springsecurity.userservice.busniess.UserService;
-import com.springsecurity.userservice.entities.Role;
-import com.springsecurity.userservice.entities.User;
-import com.springsecurity.userservice.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.springsecurity.userservice.service.UserService;
+import com.springsecurity.userservice.model.User;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
